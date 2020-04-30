@@ -1,0 +1,10 @@
+.NavLink {
+    margin: 10px 25px;
+    color: #61dafb;
+}
+
+.ActiveLink,
+.NavLink:hover {
+    text-decoration: underline;
+    color: #7caab6;
+}
