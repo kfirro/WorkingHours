@@ -1,8 +1,8 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import classes from './Navigation.module.css';
 import LogoutLink from './LogoutLink/LogoutLink';
-import * as loginService from '../../../services/LoginService';
+import { UserContext } from '../../../Providers/UserProvider/UserProvider';
 
 type NavigationProps = {
     logoutClicked: (e: React.MouseEvent) => void
@@ -10,12 +10,12 @@ type NavigationProps = {
 
 
 const Navigation: FunctionComponent<NavigationProps> = ({logoutClicked}) => {
-    let logoutClasses = loginService.isLoggedIn() ? classes.NavLink : [classes.NavLink, classes.Disabled].join(' ');
+    const user = useContext(UserContext).user;
+    let logoutClasses = user ? classes.NavLink : [classes.NavLink, classes.Disabled].join(' ');
     return (
         <nav>
             <ul>
                 <li style={{ listStyleType: 'none' }}>
-                    {/* <NavLink to="/login" className={classes.NavLink} activeClassName={classes.ActiveLink}>Login</NavLink> */}
                     <NavLink to="/workinghours" className={classes.NavLink} activeClassName={classes.ActiveLink}>Calculator</NavLink>
                     <LogoutLink navTo="/" cssClass={logoutClasses} activeCssClass={classes.ActiveLink} clicked={logoutClicked}>Logout</LogoutLink>
                 </li>

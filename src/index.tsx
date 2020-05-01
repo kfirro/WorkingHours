@@ -19,6 +19,7 @@ var firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+export const auth = firebase.auth();
 firebase.analytics();
 
 ReactDOM.render(
