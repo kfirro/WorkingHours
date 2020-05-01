@@ -2,11 +2,15 @@ import React, { Component } from 'react';
 import classes from './Header.module.css';
 import Navigation from '../components/Header/Navigation/Navigation';
 
-class Header extends Component<{}>{
+type HeaderProps = {
+    logoutClicked: (e: React.MouseEvent) => void
+}
+
+class Header extends Component<HeaderProps>{
     render() {
         return <div className={classes.App}>
             <header className={classes.AppHeader}>
-                <Navigation/>
+                <Navigation logoutClicked={this.props.logoutClicked}/>
             </header>
         </div>
     }

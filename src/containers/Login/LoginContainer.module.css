@@ -136,3 +136,7 @@ input {
 .TextCenter {
     text-align: center;
 }
+
+.Error {
+    color: red;
+}
