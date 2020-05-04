@@ -42,41 +42,46 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
         return (
             !isLoggedIn ? <Redirect to="/login" /> :
                 <React.Fragment>
-                    <div>Hello, {user?.email}</div>
-                    <div className={classes.PanelWrapper}>
-                        <MonthPicker minValue={this.createMinMonthValue()} maxValue={this.createMaxMonthValue()}
-                            months={this.state.months} monthChangedHandler={this.monthChangedHanlder}
-                            selectedMonthValue={this.state.currentMonth} createNewMonthHandler={this.createNewMonthHandler} />
-                    </div>
-                    <div className={classes.StatsWrapper}>
-                        <div>
-                            <ul>
-                                <li>Working days: 22</li>
-                                <li>Hours needed: 198h</li>
-                                <li>Total hours done: 214h 11m</li>
-                                <li>Time left: 0h</li>
-                                <li>Balance: 43h 11m</li>
-                                <li>Extra time (custom): 2h 15m</li>
-                            </ul>
+                    <aside className={classes.AsideWrapper} >
+                        <div>Hello, {user?.email}</div>
+                        <div className={classes.PanelWrapper}>
+                            <MonthPicker minValue={this.createMinMonthValue()} maxValue={this.createMaxMonthValue()}
+                                months={this.state.months} monthChangedHandler={this.monthChangedHanlder}
+                                selectedMonthValue={this.state.currentMonth} createNewMonthHandler={this.createNewMonthHandler} />
                         </div>
-                        <div className={classes.StatsHourWrapper}>
+                        <div className={classes.StatsWrapper}>
                             <div>
-                                Calculate by: 
-                                <select name="hoursPreDayDDL">
-                                    <option value="9">9</option>
-                                    <option value="8.5">8.5</option>
-                                    <option value="8">8</option>
-                                </select>
+                                <ul>
+                                    <li>Working days: 22</li>
+                                    <li>Hours needed: 198h</li>
+                                    <li>Total hours done: 214h 11m</li>
+                                    <li>Time left: 0h</li>
+                                    <li>Balance: 43h 11m</li>
+                                    <li>Extra time (custom): 2h 15m</li>
+                                </ul>
                             </div>
-                            <div>
-                                Calculate extra hours by: 
+                            <div className={classes.StatsHourWrapper}>
+                                <div>
+                                    Calculate by:
                                 <select name="hoursPreDayDDL">
-                                    <option value="0">None</option>
-                                    <option value="8.5">After 8.5h</option>
-                                </select>
+                                        <option value="9">9</option>
+                                        <option value="8.5">8.5</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    Calculate extra hours by:
+                                <select name="hoursPreDayDDL">
+                                        <option value="0">None</option>
+                                        <option value="8.5">After 8.5h</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </aside>
+                    <main className={classes.MainWrapper}>
+
+                    </main>
                 </React.Fragment>
         );
     }

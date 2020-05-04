@@ -8,11 +8,9 @@ type HeaderProps = {
 
 class Header extends Component<HeaderProps>{
     render() {
-        return <div className={classes.App}>
-            <header className={classes.AppHeader}>
+        return <header className={classes.AppHeader}>
                 <Navigation logoutClicked={this.props.logoutClicked}/>
-            </header>
-        </div>
+            </header>        
     }
 }
 

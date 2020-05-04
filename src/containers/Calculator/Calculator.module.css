@@ -6,3 +6,15 @@
     width: 300px;
     margin: 240px 0px;
 }
+
+.AsideWrapper {
+    grid-column: 1 / 2;
+    grid-row: 2 / 4;
+    background: green;
+}
+
+.MainWrapper {
+    grid-column: 2 / 3;
+    grid-row: 2 / 4;
+    background: pink;
+}

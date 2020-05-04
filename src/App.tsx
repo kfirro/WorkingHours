@@ -12,15 +12,15 @@ function App() {
   return (
     <UserProvider>
       <BrowserRouter>
-        <Header logoutClicked={loginService.logOut} />
-        <div className={classes.Container}>
-          <Switch>
-            <Route exact path="/login" component={LoginContainer} />
-            <Route exact path="/workinghours" component={Calculator} />
-            <Redirect from="/" to="/login" />
-          </Switch>
+        <div className={classes.AppContainer}>
+          <Header logoutClicked={loginService.logOut} />
+            <Switch>
+              <Route exact path="/login" component={LoginContainer} />
+              <Route exact path="/workinghours" component={Calculator} />
+              <Redirect from="/" to="/login" />
+            </Switch>
+          <Footer />
         </div>
-        <Footer />
       </BrowserRouter>
     </UserProvider>
   );
