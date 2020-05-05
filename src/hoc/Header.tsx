@@ -9,7 +9,7 @@ type HeaderProps = {
 class Header extends Component<HeaderProps>{
     render() {
         return <header className={classes.AppHeader}>
-                <Navigation logoutClicked={this.props.logoutClicked}/>
+                <Navigation logoutClicked={this.props.logoutClicked} />
             </header>        
     }
 }

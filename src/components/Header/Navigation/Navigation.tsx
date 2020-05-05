@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from 'react';
+import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import classes from './Navigation.module.css';
 import LogoutLink from './LogoutLink/LogoutLink';
@@ -10,16 +10,20 @@ type NavigationProps = {
 }
 
 
-const Navigation: FunctionComponent<NavigationProps> = ({logoutClicked}) => {
+const Navigation: React.FC<NavigationProps> = ({logoutClicked}) => {
     const user = useContext(UserContext).user;
     let logoutClasses = user ? classes.NavLink : [classes.NavLink, classes.Disabled].join(' ');
     return (
         <nav>
-            <ul>
-                <li style={{ listStyleType: 'none' }}>
-                    <img style={{width: '30px',height: '30px',float: 'right',padding: '0px 10px'}} src={logo} alt="logo" />
-                    <NavLink to="/workinghours" className={classes.NavLink} activeClassName={classes.ActiveLink}>Calculator</NavLink>
+            <ul style={{ listStyleType: 'none', display: 'flex' }}>
+                <li>                    
+                    <NavLink to="/workinghours" className={classes.NavLink} activeClassName={classes.ActiveLink}>Calculator</NavLink>                    
+                </li>
+                <li>
                     <LogoutLink navTo="/" cssClass={logoutClasses} activeCssClass={classes.ActiveLink} clicked={logoutClicked}>Logout</LogoutLink>
+                </li>
+                <li style={{marginLeft: 'auto'}}>
+                    <img className={classes.HideLogoThumbMobile} style={{width: '30px',height: '30px',padding: '0px 10px'}} src={logo} alt="logo" />
                 </li>
             </ul>
         </nav>
