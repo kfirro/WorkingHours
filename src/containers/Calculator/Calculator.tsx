@@ -3,22 +3,35 @@ import { UserContext } from '../../Providers/UserProvider/UserProvider';
 import { Redirect } from 'react-router-dom';
 import MonthPicker, { Month } from '../../components/Calculator/MonthPicker';
 import classes from './Calculator.module.css';
+import axios from '../../services/AxiosInstance';
+import { AxiosError, AxiosResponse } from 'axios';
+
+interface Dictionary<T> {
+    [Key: string]: T;
+}
 
 type CalculatorProps = {
 
 }
 type CalculatorState = {
     months: Array<Month>,
-    currentMonth: string
+    currentMonth: string,
+    hoursPerDay: Dictionary<string>,
+    extraHoursPerDay: Dictionary<string>,
+    error: string | undefined
 }
 
 export default class Calculator extends Component<CalculatorProps, CalculatorState>{
+    _isMounted = false;
     static contextType = UserContext;
     context!: React.ContextType<typeof UserContext>;
     state: CalculatorState = {
         months: new Array<Month>({ date: new Date("01/04/2020"), displayName: "2020-04" },
             { date: new Date("01/05/2020"), displayName: "2020-05" }, { date: new Date("01/06/2020"), displayName: "2020-06" }),
-        currentMonth: ""
+        currentMonth: "",
+        hoursPerDay: {},
+        extraHoursPerDay: {},
+        error: undefined
     }
     monthChangedHanlder = (e: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ currentMonth: e.target.value ?? "" });
@@ -36,15 +49,58 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
     createMaxMonthValue = () => {
         return new Date();
     }
+    setHoursPerDay = () => {
+        axios.get('hoursPerDayOptions.json')
+            .then((response: AxiosResponse) => {
+                if (this._isMounted) {
+                    this.setState({ hoursPerDay: response.data });
+                }
+            }).catch((err: AxiosError) => {
+                if (this._isMounted) {
+                    this.setState({ error: err.message });
+                }
+            });
+    }
+    setExtraHoursPerDay = () => {
+        axios.get('extraHoursOptions.json')
+            .then((response: AxiosResponse) => {
+                if (this._isMounted) {
+                    this.setState({ extraHoursPerDay: response.data });
+                }
+            }).catch((err: AxiosError) => {
+                if (this._isMounted) {
+                    this.setState({ error: err.message });
+                }
+            });
+    }
+    componentDidMount() {
+        this._isMounted = true;
+        this.setHoursPerDay();
+        this.setExtraHoursPerDay();
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+    replaceSpecialChars = (str: string): string => {
+        return str?.replace('_',' ').replace('-','.');
+    }
     render() {
         const user = this.context.user;
         const displayName = user?.displayName ?? user?.email;
         const isLoggedIn = user ? true : false;
+        const hoursPerDayDDL = <select name="hoursPerDayDDL">
+            {Object.values(this.state.hoursPerDay).map((h,index) => { return <option key={index + '_' + h} value={h}>{h}</option>;} )}
+        </select>;
+        const extraHoursPerDayDDL = <select name="extraHoursPerDayDDL">
+            {Object.keys(this.state.extraHoursPerDay).map(
+                (h,index) => { return <option key={index + '_' + h} value={this.state.extraHoursPerDay[h]}>{this.replaceSpecialChars(h)}</option>;} )
+            }
+        </select>;
         return (
             !isLoggedIn ? <Redirect to="/login" /> :
                 <React.Fragment>
                     <aside className={classes.AsideWrapper} >
-                        <div style={{textTransform: 'capitalize'}}>Hello, {displayName}</div>
+                        <div style={{ textTransform: 'capitalize' }}>Hello, {displayName}</div>
                         <div className={classes.PanelWrapper}>
                             <MonthPicker minValue={this.createMinMonthValue()} maxValue={this.createMaxMonthValue()}
                                 months={this.state.months} monthChangedHandler={this.monthChangedHanlder}
@@ -64,18 +120,11 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
                             <div className={classes.StatsHourWrapper}>
                                 <div>
                                     Calculate by:
-                                <select name="hoursPreDayDDL">
-                                        <option value="9">9</option>
-                                        <option value="8.5">8.5</option>
-                                        <option value="8">8</option>
-                                    </select>
+                                    {hoursPerDayDDL}
                                 </div>
                                 <div>
                                     Calculate extra hours by:
-                                <select name="hoursPreDayDDL">
-                                        <option value="0">None</option>
-                                        <option value="8.5">After 8.5h</option>
-                                    </select>
+                                    {extraHoursPerDayDDL}
                                 </div>
                             </div>
                         </div>

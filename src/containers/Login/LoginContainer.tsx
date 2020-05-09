@@ -45,9 +45,21 @@ export default class LoginContainer extends Component<{}, LoginContainerState>{
     onPasswordChanged = (e: any) => {
         this.setState({ password: e.target.value });
     }
-    render() {
-        let errorDiv = this.state.error ? <div className={classes.Error}><h4>{this.state.error}</h4></div> : null;
-        let loginWithCredentials = this.state.showCredentials ? <div><div className={classes.FormField}>
+    getInitialLoginHtml = () => {
+        return !this.state.showCredentials ? <div>
+            <div className={[classes.ButtonWrapper].join(' ')}>
+                <input type="submit" value="Proceed with credentials" onClick={(e) => this.setShowCredentials(e, true)} />
+            </div>
+            <div className={classes.FormField} style={{ justifyContent: 'center' }}>
+                OR
+                    </div>
+            <div className={[classes.ButtonWrapper].join(' ')}>
+                <input type="submit" value="Proceed with Gmail" onClick={(e) => this.handleLoginWithGmailClicked(e)} />
+            </div>
+        </div> : undefined;
+    }
+    getLoginWithCredentialsHtml = () => {
+        return this.state.showCredentials ? <div><div className={classes.FormField}>
             <label className={classes.User} htmlFor="login-username"><span className={classes.Hidden}>Username</span></label>
             <input id="login-username" type="text" className="form-input" placeholder="Username" required onChange={(e) => this.onEmailChanged(e)} />
         </div>
@@ -62,17 +74,11 @@ export default class LoginContainer extends Component<{}, LoginContainerState>{
                 <input type="submit" value="Back to login options" onClick={(e) => this.setShowCredentials(e, false)} />
             </div>
         </div> : undefined;
-        let loginInitial = !this.state.showCredentials ? <div>
-            <div className={[classes.ButtonWrapper].join(' ')}>
-                <input type="submit" value="Proceed with credentials" onClick={(e) => this.setShowCredentials(e,true)} />
-            </div>
-            <div className={classes.FormField} style={{ justifyContent: 'center' }}>
-                OR
-                        </div>
-            <div className={[classes.ButtonWrapper].join(' ')}>
-                <input type="submit" value="Proceed with Gmail" onClick={(e) => this.handleLoginWithGmailClicked(e)} />
-            </div>
-        </div> : undefined;
+    }
+    render() {
+        let errorDiv = this.state.error ? <div className={classes.Error}><h4>{this.state.error}</h4></div> : null;
+        let loginWithCredentials = this.getLoginWithCredentialsHtml();
+        let loginInitial = this.getInitialLoginHtml();
         let loginContainer = this.context.user ? <Redirect to="/workinghours" /> : <main className={classes.MainWrapper}>
             <div className={classes.LoginContainer}>
                 <img src={logo} alt="logo" style={{ height: '100px', width: '100px' }} />

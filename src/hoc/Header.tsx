@@ -16,7 +16,7 @@ class Header extends Component<HeaderProps>{
     render() {
         let hideThumbnail = this.props.location.pathname === "/login";
         return <header className={classes.AppHeader}>
-                <Navigation logoutClicked={this.props.logoutClicked} hideThumbnail={hideThumbnail}/>
+                <Navigation logoutClicked={this.props.logoutClicked} hideThumbnail={hideThumbnail} showMenu={!hideThumbnail}/>
             </header>        
     }
 }
