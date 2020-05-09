@@ -5,6 +5,8 @@ import MonthPicker, { Month } from '../../components/Calculator/MonthPicker';
 import classes from './Calculator.module.css';
 import axios from '../../services/AxiosInstance';
 import { AxiosError, AxiosResponse } from 'axios';
+import Loader from 'react-loader';
+import loaderClasses from '../../components/Loader/Loader.module.css';
 
 interface Dictionary<T> {
     [Key: string]: T;
@@ -18,7 +20,8 @@ type CalculatorState = {
     currentMonth: string,
     hoursPerDay: Dictionary<string>,
     extraHoursPerDay: Dictionary<string>,
-    error: string | undefined
+    error: string | undefined,
+    componentLoaded: boolean
 }
 
 export default class Calculator extends Component<CalculatorProps, CalculatorState>{
@@ -31,7 +34,8 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
         currentMonth: "",
         hoursPerDay: {},
         extraHoursPerDay: {},
-        error: undefined
+        error: undefined,
+        componentLoaded: false
     }
     monthChangedHanlder = (e: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ currentMonth: e.target.value ?? "" });
@@ -73,61 +77,69 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
                 }
             });
     }
+    setComponentLoaded = () => {
+        if (this._isMounted) {
+            this.setState({ componentLoaded: true });
+        }
+    }
     componentDidMount() {
         this._isMounted = true;
         this.setHoursPerDay();
         this.setExtraHoursPerDay();
+        this.setComponentLoaded();
     }
     componentWillUnmount() {
         this._isMounted = false;
     }
     replaceSpecialChars = (str: string): string => {
-        return str?.replace('_',' ').replace('-','.');
+        return str?.replace('_', ' ').replace('-', '.');
     }
     render() {
         const user = this.context.user;
         const displayName = user?.displayName ?? user?.email;
         const isLoggedIn = user ? true : false;
         const hoursPerDayDDL = <select name="hoursPerDayDDL">
-            {Object.values(this.state.hoursPerDay).map((h,index) => { return <option key={index + '_' + h} value={h}>{h}</option>;} )}
+            {Object.values(this.state.hoursPerDay).map((h, index) => { return <option key={index + '_' + h} value={h}>{h}</option>; })}
         </select>;
         const extraHoursPerDayDDL = <select name="extraHoursPerDayDDL">
             {Object.keys(this.state.extraHoursPerDay).map(
-                (h,index) => { return <option key={index + '_' + h} value={this.state.extraHoursPerDay[h]}>{this.replaceSpecialChars(h)}</option>;} )
+                (h, index) => { return <option key={index + '_' + h} value={this.state.extraHoursPerDay[h]}>{this.replaceSpecialChars(h)}</option>; })
             }
         </select>;
         return (
             !isLoggedIn ? <Redirect to="/login" /> :
                 <React.Fragment>
                     <aside className={classes.AsideWrapper} >
-                        <div style={{ textTransform: 'capitalize' }}>Hello, {displayName}</div>
-                        <div className={classes.PanelWrapper}>
-                            <MonthPicker minValue={this.createMinMonthValue()} maxValue={this.createMaxMonthValue()}
-                                months={this.state.months} monthChangedHandler={this.monthChangedHanlder}
-                                selectedMonthValue={this.state.currentMonth} createNewMonthHandler={this.createNewMonthHandler} />
-                        </div>
-                        <div className={classes.StatsWrapper}>
-                            <div>
-                                <ul>
-                                    <li>Working days: 22</li>
-                                    <li>Hours needed: 198h</li>
-                                    <li>Total hours done: 214h 11m</li>
-                                    <li>Time left: 0h</li>
-                                    <li>Balance: 43h 11m</li>
-                                    <li>Extra time (custom): 2h 15m</li>
-                                </ul>
+                        <Loader className={loaderClasses.Loader} loaded={this.state.componentLoaded}>
+                            <div style={{ textTransform: 'capitalize' }}>Hello, {displayName}</div>
+                            <div className={classes.PanelWrapper}>
+                                <MonthPicker minValue={this.createMinMonthValue()} maxValue={this.createMaxMonthValue()}
+                                    months={this.state.months} monthChangedHandler={this.monthChangedHanlder}
+                                    selectedMonthValue={this.state.currentMonth} createNewMonthHandler={this.createNewMonthHandler} />
                             </div>
-                            <div className={classes.StatsHourWrapper}>
+                            <div className={classes.StatsWrapper}>
                                 <div>
-                                    Calculate by:
+                                    <ul>
+                                        <li>Working days: 22</li>
+                                        <li>Hours needed: 198h</li>
+                                        <li>Total hours done: 214h 11m</li>
+                                        <li>Time left: 0h</li>
+                                        <li>Balance: 43h 11m</li>
+                                        <li>Extra time (custom): 2h 15m</li>
+                                    </ul>
+                                </div>
+                                <div className={classes.StatsHourWrapper}>
+                                    <div>
+                                        Calculate by:
                                     {hoursPerDayDDL}
-                                </div>
-                                <div>
-                                    Calculate extra hours by:
+                                    </div>
+                                    <div>
+                                        Calculate extra hours by:
                                     {extraHoursPerDayDDL}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </Loader>
                     </aside>
                     <main className={classes.MainWrapper}>
 
