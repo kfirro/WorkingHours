@@ -27,6 +27,13 @@ export default class LoginContainer extends Component<{}, LoginContainerState>{
         if (res && res !== "OK")
             this.setState({ error: res });
     }
+    handleLoginWithGmailClicked = async (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const res = await loginService.loginWithGmail();
+        if (res && res !== "OK")
+            this.setState({ error: res });
+    }
     onEmailChanged = (e: any) => {
         this.setState({ email: e.target.value });
     }
@@ -51,6 +58,12 @@ export default class LoginContainer extends Component<{}, LoginContainerState>{
                         </div>
                         <div className={[classes.FormField, classes.ButtonWrapper].join(' ')}>
                             <input type="submit" value="Login" onClick={(e) => this.handleLoginClicked(e, this.state.email, this.state.password)} />
+                        </div>
+                        <div className={classes.FormField} style={{justifyContent: 'center'}}>
+                            OR
+                        </div>
+                        <div className={[classes.ButtonWrapper].join(' ')}>
+                            <input type="submit" value="Proceed with Gmail" onClick={(e) => this.handleLoginWithGmailClicked(e)} />
                         </div>
                     </form>
                 </div>

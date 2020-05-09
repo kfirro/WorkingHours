@@ -13,12 +13,6 @@ type HeaderProps = RouteComponentProps<PathParamsType> & {
 }
 
 class Header extends Component<HeaderProps>{
-    componentDidMount(){
-        console.log(this.props);
-    }
-    componentDidUpdate(){
-        console.log(this.props);
-    }
     render() {
         let hideThumbnail = this.props.location.pathname === "/login";
         return <header className={classes.AppHeader}>

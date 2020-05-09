@@ -38,12 +38,13 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
     }
     render() {
         const user = this.context.user;
+        const displayName = user?.displayName ?? user?.email;
         const isLoggedIn = user ? true : false;
         return (
             !isLoggedIn ? <Redirect to="/login" /> :
                 <React.Fragment>
                     <aside className={classes.AsideWrapper} >
-                        <div>Hello, {user?.email}</div>
+                        <div style={{textTransform: 'capitalize'}}>Hello, {displayName}</div>
                         <div className={classes.PanelWrapper}>
                             <MonthPicker minValue={this.createMinMonthValue()} maxValue={this.createMaxMonthValue()}
                                 months={this.state.months} monthChangedHandler={this.monthChangedHanlder}

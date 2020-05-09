@@ -19,7 +19,13 @@ var firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-export const auth = firebase.auth();
+const auth = firebase.auth();
+const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
+googleAuthProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+googleAuthProvider.setCustomParameters({
+  'login_hint': 'user@example.com'
+});
+export { auth , googleAuthProvider};
 firebase.analytics();
 
 ReactDOM.render(

@@ -98,7 +98,7 @@ input {
     background-color: #00B9BC;
     color: #eee;
     font-weight: bold;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     width: 260px;
 }
 
