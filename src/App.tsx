@@ -14,11 +14,11 @@ function App() {
       <BrowserRouter>
         <div className={classes.AppContainer}>
           <Header logoutClicked={loginService.logOut} />
-            <Switch>
-              <Route exact path="/login" component={LoginContainer} />
-              <Route exact path="/workinghours" component={Calculator} />
-              <Redirect from="/" to="/login" />
-            </Switch>
+          <Switch>
+            <Route exact path="/login" component={LoginContainer} />
+            <Route exact path="/workinghours" component={Calculator} />
+            <Redirect from="/" to="/login" />
+          </Switch>
           <Footer />
         </div>
       </BrowserRouter>

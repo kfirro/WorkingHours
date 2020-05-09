@@ -11,6 +11,12 @@
     grid-template-columns: 260px auto;
 }
 
+input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
 @media only screen and (max-device-width: 600px),
 only screen and (max-width: 600px) {
     .AppContainer {
