@@ -37,7 +37,7 @@ export default class LoginContainer extends Component<{}, LoginContainerState>{
             this.setState({ error: res });
     }
     setShowCredentials = async (e: React.MouseEvent<HTMLInputElement, MouseEvent>, val: boolean) => {
-        this.setState({ showCredentials: val });
+        this.setState({ showCredentials: val, error: "" });
     }
     onEmailChanged = (e: any) => {
         this.setState({ email: e.target.value });

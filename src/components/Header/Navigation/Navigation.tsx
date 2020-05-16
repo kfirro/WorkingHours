@@ -4,6 +4,8 @@ import classes from './Navigation.module.css';
 import LogoutLink from './LogoutLink/LogoutLink';
 import { UserContext } from '../../../Providers/UserProvider/UserProvider';
 import logo from '../../../assets/images/logo192.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 type NavigationProps = {
     logoutClicked: (e: React.MouseEvent) => void,
@@ -25,17 +27,17 @@ const Navigation: React.FC<NavigationProps> = ({ logoutClicked, hideThumbnail, s
     //     </li>
     // </> : undefined;
     let menu = showMenu ?
-        <li>
-            <LogoutLink navTo="/" cssClass={logoutClasses} activeCssClass={classes.ActiveLink} clicked={logoutClicked}>Logout</LogoutLink>
+        <li style={{marginLeft: 'auto'}}>
+            <LogoutLink navTo="/" cssClass={logoutClasses} activeCssClass={classes.ActiveLink} clicked={logoutClicked}><FontAwesomeIcon icon={faSignOutAlt}/></LogoutLink>
         </li>
         : undefined;
     return (
         <nav>
-            <ul style={{ listStyleType: 'none', display: 'flex' }}>
-                {menu}
-                <li style={{ marginLeft: 'auto' }}>
+            <ul style={{ listStyleType: 'none', display: 'flex', margin: '0', padding: '0' }}>
+                <li style={{ order: 0 }}>
                     <img className={hideThumbnailClass} style={{ width: '30px', height: '30px', padding: '0px 10px' }} src={logo} alt="logo" />
                 </li>
+                {menu}
             </ul>
         </nav>
     );

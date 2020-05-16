@@ -4,8 +4,10 @@ import { Redirect } from 'react-router-dom';
 import MonthPicker, { Month } from '../../components/Calculator/MonthPicker';
 import classes from './Calculator.module.css';
 import axios from '../../services/AxiosInstance';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import Loader from 'react-loader';
+import Select from 'react-select'
+import * as dataService from '../../services/DataService';
 import loaderClasses from '../../components/Loader/Loader.module.css';
 
 interface Dictionary<T> {
@@ -29,8 +31,9 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
     static contextType = UserContext;
     context!: React.ContextType<typeof UserContext>;
     state: CalculatorState = {
-        months: new Array<Month>({ date: new Date("01/04/2020"), displayName: "2020-04" },
-            { date: new Date("01/05/2020"), displayName: "2020-05" }, { date: new Date("01/06/2020"), displayName: "2020-06" }),
+        // months: new Array<Month>({ date: new Date("01/04/2020"), displayName: "2020-04" },
+        //     { date: new Date("01/05/2020"), displayName: "2020-05" }, { date: new Date("01/06/2020"), displayName: "2020-06" }),
+        months: new Array<Month>(),
         currentMonth: "",
         hoursPerDay: {},
         extraHoursPerDay: {},
@@ -43,9 +46,10 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
     createNewMonthHandler = () => {
         if (this.state.months.find(m => m.displayName === this.state.currentMonth))
             return;
+        //TODO: Create a new month from HebCal service and save it in the DB
         let newMonth = [...this.state.months];
         newMonth.push({ date: new Date(`01/${this.state.currentMonth.replace('-', '/')}`), displayName: this.state.currentMonth });
-        this.setState({ months: [...newMonth] });
+        this.setState({ months: newMonth });
     }
     createMinMonthValue = () => {
         return new Date(new Date().setFullYear(new Date().getFullYear() - 1));
@@ -53,59 +57,77 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
     createMaxMonthValue = () => {
         return new Date();
     }
-    setHoursPerDay = () => {
-        axios.get('hoursPerDayOptions.json')
-            .then((response: AxiosResponse) => {
-                if (this._isMounted) {
-                    this.setState({ hoursPerDay: response.data });
-                }
-            }).catch((err: AxiosError) => {
-                if (this._isMounted) {
-                    this.setState({ error: err.message });
-                }
-            });
+    setHoursPerDay = async () => {
+        try{
+            let response: AxiosResponse = await axios.get('hoursPerDayOptions.json');
+            if (this._isMounted) {
+                this.setState({ hoursPerDay: response.data });
+            }
+        }
+        catch(err){
+            if (this._isMounted) {
+                this.setState({ error: err.message });
+            }
+        }
     }
-    setExtraHoursPerDay = () => {
-        axios.get('extraHoursOptions.json')
-            .then((response: AxiosResponse) => {
-                if (this._isMounted) {
-                    this.setState({ extraHoursPerDay: response.data });
-                }
-            }).catch((err: AxiosError) => {
-                if (this._isMounted) {
-                    this.setState({ error: err.message });
-                }
-            });
+    setExtraHoursPerDay = async () => {
+        try{        
+            let response: AxiosResponse = await axios.get('extraHoursOptions.json');
+            if (this._isMounted) {
+                this.setState({ extraHoursPerDay: response.data });
+            }
+        }
+        catch(err){
+            if (this._isMounted) {
+                this.setState({ error: err.message });
+            }
+        }
+    }
+    setMonths = async () => {
+        let months = await dataService.getSavedMonths(this.context.user?.email ?? "");
+        if (this._isMounted) {
+            this.setState({ months: months });
+        }
     }
     setComponentLoaded = () => {
         if (this._isMounted) {
             this.setState({ componentLoaded: true });
         }
     }
-    componentDidMount() {
+    async componentDidMount() {
         this._isMounted = true;
         this.setHoursPerDay();
         this.setExtraHoursPerDay();
+        this.setMonths();
         this.setComponentLoaded();
     }
+    getUserDisplayName = (): string => this.context.user?.displayName ?? this.context.user?.email ?? "";
+
     componentWillUnmount() {
         this._isMounted = false;
     }
     replaceSpecialChars = (str: string): string => {
         return str?.replace('_', ' ').replace('-', '.');
     }
+    extraHoursChangedHandler(){
+
+    }
+    hoursPerDayChangedHandler(){
+
+    }
     render() {
-        const user = this.context.user;
-        const displayName = user?.displayName ?? user?.email;
-        const isLoggedIn = user ? true : false;
-        const hoursPerDayDDL = <select name="hoursPerDayDDL">
-            {Object.values(this.state.hoursPerDay).map((h, index) => { return <option key={index + '_' + h} value={h}>{h}</option>; })}
-        </select>;
-        const extraHoursPerDayDDL = <select name="extraHoursPerDayDDL">
-            {Object.keys(this.state.extraHoursPerDay).map(
-                (h, index) => { return <option key={index + '_' + h} value={this.state.extraHoursPerDay[h]}>{this.replaceSpecialChars(h)}</option>; })
-            }
-        </select>;
+        const displayName = this.getUserDisplayName();
+        const isLoggedIn = this.context.user ? true : false;
+        const hoursPerDayOptions = Object.values(this.state.hoursPerDay).map((h, index) => { 
+            return { key: index + '_' + h, value: h, label: h }; 
+        });
+        const extraHoursOptions = Object.keys(this.state.extraHoursPerDay).map((h, index) => { 
+                return { key: index + '_' + h, value: this.state.extraHoursPerDay[h], label: this.replaceSpecialChars(h) };
+        });
+        const selectStyle = {
+            width: '200px',
+            margin: '10px 5px'
+        };
         return (
             !isLoggedIn ? <Redirect to="/login" /> :
                 <React.Fragment>
@@ -129,13 +151,13 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
                                     </ul>
                                 </div>
                                 <div className={classes.StatsHourWrapper}>
-                                    <div>
-                                        Calculate by:
-                                    {hoursPerDayDDL}
+                                    <div style={selectStyle}>
+                                        <Select isMulti={false} options={hoursPerDayOptions} onChange={this.hoursPerDayChangedHandler} 
+                                            defaultValue={hoursPerDayOptions[0]} placeholder="Hours per day" />
                                     </div>
-                                    <div>
-                                        Calculate extra hours by:
-                                    {extraHoursPerDayDDL}
+                                    <div style={selectStyle}>
+                                        <Select isMulti={false} options={extraHoursOptions} onChange={this.extraHoursChangedHandler} 
+                                            defaultValue={extraHoursOptions[0]} placeholder="Extra hours per day" />
                                     </div>
                                 </div>
                             </div>

@@ -1,4 +1,7 @@
-.MonthPicker {}
+.MonthPicker {
+    width: 200px;
+    margin: 10px 5px;
+}
 
 .MonthPicker ul {
     list-style-type: none;

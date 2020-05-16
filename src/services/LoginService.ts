@@ -1,5 +1,5 @@
 import "firebase/analytics";
-import {auth, googleAuthProvider} from "../index";
+import { auth, googleAuthProvider } from "../index";
 
 export async function loginWithGmail(): Promise<string> {
     try {
@@ -28,11 +28,12 @@ export async function logIn(email: string, password: string): Promise<string> {
             return `${errorMessage}`;
         });
 }
-export function logOut(): void {
-    auth.signOut().then(() => {
-        return true;
-    }).catch(function (error) {
-        console.log(`Logout failed: ${error}`);
-        return false;
-    });
+export async function logOut(): Promise<void> {
+    if (window.confirm('Do you really want to logout?')){
+        try {
+            await auth.signOut();
+        } catch (error) {
+            console.log(`Logout failed: ${error}`);
+        }
+    }
 }
