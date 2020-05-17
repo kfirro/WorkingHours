@@ -9,6 +9,7 @@ import Loader from 'react-loader';
 import Select from 'react-select'
 import * as dataService from '../../services/DataService';
 import loaderClasses from '../../components/Loader/Loader.module.css';
+import { PickerValue } from '../../components/Calculator/MonthPicker';
 
 interface Dictionary<T> {
     [Key: string]: T;
@@ -19,7 +20,7 @@ type CalculatorProps = {
 }
 type CalculatorState = {
     months: Array<Month>,
-    currentMonth: string,
+    currentMonth: PickerValue,
     hoursPerDay: Dictionary<string>,
     extraHoursPerDay: Dictionary<string>,
     error: string | undefined,
@@ -31,26 +32,40 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
     static contextType = UserContext;
     context!: React.ContextType<typeof UserContext>;
     state: CalculatorState = {
-        // months: new Array<Month>({ date: new Date("01/04/2020"), displayName: "2020-04" },
-        //     { date: new Date("01/05/2020"), displayName: "2020-05" }, { date: new Date("01/06/2020"), displayName: "2020-06" }),
         months: new Array<Month>(),
-        currentMonth: "",
+        currentMonth: {year: new Date().getFullYear(), month: new Date().getMonth()+1},
         hoursPerDay: {},
         extraHoursPerDay: {},
         error: undefined,
         componentLoaded: false
     }
-    monthChangedHanlder = (e: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({ currentMonth: e.target.value ?? "" });
+    monthChangedHanlder = (newValue: PickerValue) => {
+        this.setState({ currentMonth: newValue });
     }
     createNewMonthHandler = () => {
-        if (this.state.months.find(m => m.displayName === this.state.currentMonth))
+        if (this.state.months.find(m => m.date.getFullYear() === this.state.currentMonth.year && m.date.getMonth() + 1 === this.state.currentMonth.month))
             return;
         //TODO: Create a new month from HebCal service and save it in the DB
         let newMonth = [...this.state.months];
-        newMonth.push({ date: new Date(`01/${this.state.currentMonth.replace('-', '/')}`), displayName: this.state.currentMonth });
+        newMonth.push(
+            { 
+                date: new Date(`01/${this.state.currentMonth.month}/${this.state.currentMonth.year}`), 
+                displayName: `${this.state.currentMonth.month.toString().padStart(2)}-${this.state.currentMonth.year}`
+            }
+        );
         this.setState({ months: newMonth });
     }
+    // monthChangedHanlder = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     this.setState({ currentMonth: e.target.value ?? "" });
+    // }
+    // createNewMonthHandler = () => {
+    //     if (this.state.months.find(m => m.displayName === this.state.currentMonth))
+    //         return;
+    //     //TODO: Create a new month from HebCal service and save it in the DB
+    //     let newMonth = [...this.state.months];
+    //     newMonth.push({ date: new Date(`01/${this.state.currentMonth.replace('-', '/')}`), displayName: this.state.currentMonth });
+    //     this.setState({ months: newMonth });
+    // }
     createMinMonthValue = () => {
         return new Date(new Date().setFullYear(new Date().getFullYear() - 1));
     }

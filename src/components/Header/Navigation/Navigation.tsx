@@ -28,7 +28,7 @@ const Navigation: React.FC<NavigationProps> = ({ logoutClicked, hideThumbnail, s
     // </> : undefined;
     let menu = showMenu ?
         <li style={{marginLeft: 'auto'}}>
-            <LogoutLink navTo="/" cssClass={logoutClasses} activeCssClass={classes.ActiveLink} clicked={logoutClicked}><FontAwesomeIcon icon={faSignOutAlt}/></LogoutLink>
+            <LogoutLink navTo="/" cssClass={logoutClasses} activeCssClass={classes.ActiveLink} clicked={logoutClicked}><FontAwesomeIcon size={"2x"} icon={faSignOutAlt}/></LogoutLink>
         </li>
         : undefined;
     return (

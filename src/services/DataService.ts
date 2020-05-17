@@ -33,7 +33,8 @@ export const getSavedMonths = async(username: string): Promise<Array<Month>> => 
         let monthArrays = new Array<Month>();
         if(res.data){
             Object.keys(res.data).forEach(m => {
-                monthArrays.push({ displayName: m, date: new Date(`01/${m.replace('-','/')}`) });
+                let dateParts = m.split('-');
+                monthArrays.push({ displayName: m, date: new Date(`${dateParts[1]}-${dateParts[0]}-01`)});
             });
         }
         return monthArrays;

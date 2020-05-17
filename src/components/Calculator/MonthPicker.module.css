@@ -9,9 +9,9 @@
 }
 
 .DatePicker {
-    margin: 10px;
+    margin: 10px 5px;
     display: flex;
-    flex-direction: column;
-    width: 150px;
-    justify-content: left;
+    flex-direction: row;
+    width: 200px;
+    justify-content: space-evenly;
 }
