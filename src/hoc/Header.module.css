@@ -7,7 +7,7 @@
      grid-row: 1 / 2;
      background: blue;
      background-color: #282c34;
-     font-size: calc(13px + 1vmin);
+     /* font-size: calc(13px + 1vmin); */
      color: white;
      display: flex;
      justify-content: space-evenly;

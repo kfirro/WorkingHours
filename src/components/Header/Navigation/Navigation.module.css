@@ -13,6 +13,10 @@
     color: #0e1e22;
 }
 
+.NavigationNavElement ul li:hover {
+    cursor: pointer;
+}
+
 @media only screen and (max-device-width: 600px),
 only screen and (max-width: 600px) {
     .HideLogoThumbMobile {

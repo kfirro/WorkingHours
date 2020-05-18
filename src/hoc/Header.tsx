@@ -9,14 +9,15 @@ type PathParamsType = {
 }
 
 type HeaderProps = RouteComponentProps<PathParamsType> & {
-    logoutClicked: (e: React.MouseEvent) => void
+    logoutClicked: (e: React.MouseEvent) => void,
+    thumbnailClicked: (e: React.MouseEvent) => void,
 }
 
 class Header extends Component<HeaderProps>{
     render() {
         let hideThumbnail = this.props.location.pathname === "/login";
         return <header className={classes.AppHeader} >
-                <Navigation logoutClicked={this.props.logoutClicked} hideThumbnail={hideThumbnail} showMenu={!hideThumbnail}/>
+                <Navigation logoutClicked={this.props.logoutClicked} hideThumbnail={hideThumbnail} showMenu={!hideThumbnail} thumbnailClicked={this.props.thumbnailClicked}/>
             </header>        
     }
 }

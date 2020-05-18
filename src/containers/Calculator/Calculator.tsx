@@ -16,7 +16,7 @@ interface Dictionary<T> {
 }
 
 type CalculatorProps = {
-
+    openSideBar: boolean
 }
 type CalculatorState = {
     months: Array<Month>,
@@ -24,7 +24,7 @@ type CalculatorState = {
     hoursPerDay: Dictionary<string>,
     extraHoursPerDay: Dictionary<string>,
     error: string | undefined,
-    componentLoaded: boolean
+    componentLoaded: boolean,    
 }
 
 export default class Calculator extends Component<CalculatorProps, CalculatorState>{
@@ -37,12 +37,13 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
         hoursPerDay: {},
         extraHoursPerDay: {},
         error: undefined,
-        componentLoaded: false
+        componentLoaded: false        
     }
-    monthChangedHanlder = (newValue: PickerValue) => {
-        this.setState({ currentMonth: newValue });
+    monthChangedHanlder = (year: number, month: number) => {
+        this.setState({ currentMonth: {year: year, month: month} });
     }
     createNewMonthHandler = () => {
+        debugger;
         if (this.state.months.find(m => m.date.getFullYear() === this.state.currentMonth.year && m.date.getMonth() + 1 === this.state.currentMonth.month))
             return;
         //TODO: Create a new month from HebCal service and save it in the DB
@@ -50,22 +51,11 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
         newMonth.push(
             { 
                 date: new Date(`01/${this.state.currentMonth.month}/${this.state.currentMonth.year}`), 
-                displayName: `${this.state.currentMonth.month.toString().padStart(2)}-${this.state.currentMonth.year}`
+                displayName: `${this.state.currentMonth.month.toString().padStart(2,'0')}-${this.state.currentMonth.year}`
             }
         );
         this.setState({ months: newMonth });
     }
-    // monthChangedHanlder = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     this.setState({ currentMonth: e.target.value ?? "" });
-    // }
-    // createNewMonthHandler = () => {
-    //     if (this.state.months.find(m => m.displayName === this.state.currentMonth))
-    //         return;
-    //     //TODO: Create a new month from HebCal service and save it in the DB
-    //     let newMonth = [...this.state.months];
-    //     newMonth.push({ date: new Date(`01/${this.state.currentMonth.replace('-', '/')}`), displayName: this.state.currentMonth });
-    //     this.setState({ months: newMonth });
-    // }
     createMinMonthValue = () => {
         return new Date(new Date().setFullYear(new Date().getFullYear() - 1));
     }
@@ -143,43 +133,44 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
             width: '200px',
             margin: '10px 5px'
         };
+        const sideBar = <aside className={classes.AsideWrapper} >
+        <Loader className={loaderClasses.Loader} loaded={this.state.componentLoaded}>
+            <div style={{ textTransform: 'capitalize' }}>Hello, {displayName}</div>
+            <div className={classes.PanelWrapper}>
+                <MonthPicker minValue={this.createMinMonthValue()} maxValue={this.createMaxMonthValue()}
+                    months={this.state.months} monthChangedHandler={this.monthChangedHanlder}
+                    selectedMonthValue={this.state.currentMonth} createNewMonthHandler={this.createNewMonthHandler} />
+            </div>
+            <div className={classes.StatsWrapper}>
+                <div>
+                    <h3>Statistics</h3>
+                    <ul>
+                        <li>Working days: 22</li>
+                        <li>Hours needed: 198h</li>
+                        <li>Total hours done: 214h 11m</li>
+                        <li>Time left: 0h</li>
+                        <li>Balance: 43h 11m</li>
+                        <li>Extra time (custom): 2h 15m</li>
+                    </ul>
+                </div>
+                <div className={classes.StatsHourWrapper}>
+                    <div style={selectStyle}>
+                        <Select isMulti={false} options={hoursPerDayOptions} onChange={this.hoursPerDayChangedHandler} 
+                            defaultValue={hoursPerDayOptions[0]} placeholder="Hours per day" />
+                    </div>
+                    <div style={selectStyle}>
+                        <Select isMulti={false} options={extraHoursOptions} onChange={this.extraHoursChangedHandler} 
+                            defaultValue={extraHoursOptions[0]} placeholder="Extra hours per day" />
+                    </div>
+                </div>
+            </div>
+        </Loader>
+    </aside>;
         return (
             !isLoggedIn ? <Redirect to="/login" /> :
                 <React.Fragment>
-                    <aside className={classes.AsideWrapper} >
-                        <Loader className={loaderClasses.Loader} loaded={this.state.componentLoaded}>
-                            <div style={{ textTransform: 'capitalize' }}>Hello, {displayName}</div>
-                            <div className={classes.PanelWrapper}>
-                                <MonthPicker minValue={this.createMinMonthValue()} maxValue={this.createMaxMonthValue()}
-                                    months={this.state.months} monthChangedHandler={this.monthChangedHanlder}
-                                    selectedMonthValue={this.state.currentMonth} createNewMonthHandler={this.createNewMonthHandler} />
-                            </div>
-                            <div className={classes.StatsWrapper}>
-                                <div>
-                                    <ul>
-                                        <li>Working days: 22</li>
-                                        <li>Hours needed: 198h</li>
-                                        <li>Total hours done: 214h 11m</li>
-                                        <li>Time left: 0h</li>
-                                        <li>Balance: 43h 11m</li>
-                                        <li>Extra time (custom): 2h 15m</li>
-                                    </ul>
-                                </div>
-                                <div className={classes.StatsHourWrapper}>
-                                    <div style={selectStyle}>
-                                        <Select isMulti={false} options={hoursPerDayOptions} onChange={this.hoursPerDayChangedHandler} 
-                                            defaultValue={hoursPerDayOptions[0]} placeholder="Hours per day" />
-                                    </div>
-                                    <div style={selectStyle}>
-                                        <Select isMulti={false} options={extraHoursOptions} onChange={this.extraHoursChangedHandler} 
-                                            defaultValue={extraHoursOptions[0]} placeholder="Extra hours per day" />
-                                    </div>
-                                </div>
-                            </div>
-                        </Loader>
-                    </aside>
+                    {this.props.openSideBar ? sideBar : null}
                     <main className={classes.MainWrapper}>
-
                     </main>
                 </React.Fragment>
         );

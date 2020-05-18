@@ -1,6 +1,6 @@
-import React, { Component, FunctionComponent } from 'react';
+import React, { FunctionComponent } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarPlus } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
 import classes from './MonthPicker.module.css';
 import Select from 'react-select';
 
@@ -10,22 +10,6 @@ type MonthBoxProps = {
 }
 type MonthBoxState = {
     value: string
-}
-class MonthBox extends Component<MonthBoxProps, MonthBoxState> {
-    state: MonthBoxState = {
-        value: this.props.value || 'N/A',
-    }
-    UNSAFE_componentWillReceiveProps(nextProps: MonthBoxProps){
-      this.setState({value: nextProps.value || 'N/A',});
-    }
-    render() {
-      return (
-        <div className="box" onClick={this._handleClick}>
-            <label>{this.state.value}</label>
-        </div>
-      );
-    }
-    _handleClick = (e: React.MouseEvent) => this.props.onClick && this.props.onClick(e);
 }
 
 export interface Month {
@@ -41,19 +25,16 @@ type MonthPickerProps = {
     minValue: Date,
     maxValue: Date,
     months: Array<Month> | null,
-    monthChangedHandler: (monthValue: PickerValue) => void,
+    monthChangedHandler: (year: number, month: number) => void,
     selectedMonthValue: PickerValue,
     createNewMonthHandler: () => void
 }
 
-function FormatDate(dateItem: Date): string {
-    return dateItem.toISOString().split("T")[0].substr(0,dateItem.toISOString().split("T")[0].length-3);
-}
 
 const MonthPicker: FunctionComponent<MonthPickerProps> = ({minValue, maxValue, months, monthChangedHandler, selectedMonthValue, createNewMonthHandler }) => {    
     const Picker = require('react-month-picker').default;
     const pickerLang = {
-        months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        months: ['01','02','03','04','05','06','07','08','09','10','11','12'],
         from: 'From', to: 'To',
     }
     let monthElements = months?.map(m=> {
@@ -63,7 +44,8 @@ const MonthPicker: FunctionComponent<MonthPickerProps> = ({minValue, maxValue, m
     const handleClickMonthBox = (e: React.MouseEvent) => {
         pickAMonthRef.current.show();
     }
-    const makeText = (val: PickerValue) => val?.year && val?.month ? (pickerLang.months[val.month-1] + '. ' + val.year) : '?';
+    monthChangedHandler = monthChangedHandler.bind(MonthPicker);
+    // const makeText = (val: PickerValue) => val?.year && val?.month ? (pickerLang.months[val.month-1] + ' - ' + val.year) : '?';
     return (
         <>
             <div className={classes.MonthViewerWrapper}>
@@ -74,18 +56,16 @@ const MonthPicker: FunctionComponent<MonthPickerProps> = ({minValue, maxValue, m
                     <span>OR</span>
                 </div>
                 <div className={classes.DatePicker}>
-                    {/* <input type="month" min={FormatDate(minValue)} max={FormatDate(maxValue)} 
-                        value={selectedMonthValue ? selectedMonthValue : FormatDate(maxValue)} onChange={(e) => monthChangedHandler(e)} /> */}
-                    <div className="edit">
                         <Picker ref={pickAMonthRef} 
                             value={selectedMonthValue} 
                             years={{ min: minValue.getFullYear(), max: { year: maxValue.getFullYear(), month: maxValue.getMonth() + 1} }} 
                             lang={pickerLang.months}
-                            onChange={() => monthChangedHandler(selectedMonthValue)}
+                            onChange={monthChangedHandler}
+                            onDismiss={() => createNewMonthHandler()}
                         />
-                        <MonthBox value={makeText(selectedMonthValue)} onClick={(e) => handleClickMonthBox(e)} />
-                    </div>
-                    <FontAwesomeIcon size={"2x"} icon={faCalendarPlus} onClick={() => createNewMonthHandler()} />
+                        <label onClick={(e) => handleClickMonthBox(e)}>
+                            <FontAwesomeIcon style={{color: '#61dafb'}} size={"2x"} icon={faCalendarAlt} />
+                        </label>
                 </div>
             </div>
         </>

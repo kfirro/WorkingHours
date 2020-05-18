@@ -9,9 +9,13 @@
 }
 
 .DatePicker {
-    margin: 10px 5px;
     display: flex;
     flex-direction: row;
     width: 200px;
-    justify-content: space-evenly;
+    justify-content: center;
+    align-items: center;
+}
+
+.DatePicker:hover {
+    cursor: pointer;
 }
