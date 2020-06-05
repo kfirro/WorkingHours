@@ -8,12 +8,17 @@ import { AxiosResponse } from 'axios';
 import Loader from 'react-loader';
 import Select from 'react-select'
 import * as dataService from '../../services/DataService';
+import ReactDataSheet from 'react-datasheet';
 import loaderClasses from '../../components/Loader/Loader.module.css';
 import { PickerValue } from '../../components/Calculator/MonthPicker';
 
 interface Dictionary<T> {
     [Key: string]: T;
 }
+type Preferences = {
+    calculateExtraHours: number,
+    hoursPerDay: number,
+} | null;
 
 type CalculatorProps = {
     openSideBar: boolean
@@ -24,7 +29,12 @@ type CalculatorState = {
     hoursPerDay: Dictionary<string>,
     extraHoursPerDay: Dictionary<string>,
     error: string | undefined,
-    componentLoaded: boolean,    
+    componentLoaded: boolean,  
+    columns: Array<string>,
+    userPreferences: Preferences,
+    extraHoursChoosedIndex: number,
+    hoursPerDayChoosedIndex: number,
+    currentMonthData: Array<any>,
 }
 
 export default class Calculator extends Component<CalculatorProps, CalculatorState>{
@@ -37,13 +47,17 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
         hoursPerDay: {},
         extraHoursPerDay: {},
         error: undefined,
-        componentLoaded: false        
+        componentLoaded: false,
+        columns: [],
+        userPreferences: null,
+        extraHoursChoosedIndex: 0,
+        hoursPerDayChoosedIndex: 0,
+        currentMonthData: [],
     }
     monthChangedHanlder = (year: number, month: number) => {
         this.setState({ currentMonth: {year: year, month: month} });
     }
     createNewMonthHandler = () => {
-        debugger;
         if (this.state.months.find(m => m.date.getFullYear() === this.state.currentMonth.year && m.date.getMonth() + 1 === this.state.currentMonth.month))
             return;
         //TODO: Create a new month from HebCal service and save it in the DB
@@ -61,6 +75,19 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
     }
     createMaxMonthValue = () => {
         return new Date();
+    }
+    setCalculatorColumns = async () => {
+        try{
+            let response: AxiosResponse = await axios.get('calculatorColumns.json');
+            if (this._isMounted) {
+                this.setState({ columns:  Object.keys(response.data)});
+            }
+        }
+        catch(err){
+            if (this._isMounted) {
+                this.setState({ error: err.message });
+            }
+        }
     }
     setHoursPerDay = async () => {
         try{
@@ -99,12 +126,49 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
             this.setState({ componentLoaded: true });
         }
     }
-    async componentDidMount() {
+    getAndSetUserPreferences = async () => {
+        let preferences: Preferences = await dataService.getUserPreferences(this.context.user?.email ?? "");
+        if (this._isMounted && preferences) {
+            Object.entries(this.state.extraHoursPerDay).forEach(([key, value], index) => {
+                if(+value === preferences?.calculateExtraHours)
+                    this.setState({ extraHoursChoosedIndex: index });
+            });
+            Object.entries(this.state.hoursPerDay).forEach(([key, value], index) => {
+                if(+value === preferences?.hoursPerDay)
+                    this.setState({ hoursPerDayChoosedIndex: index });
+            });
+            this.setState({ userPreferences: preferences });
+        }
+    }
+    setSelectedMonthData = async () => {
+        //TODO: Fetch from data service
+        //{"Day": "Sunday","Date": "01/05/2020", "Entrance time": "07:00", "Exit time": "18:00", "Total": "09:00", "Holiday": "יום העצמאות", "Comment": "blabla"}
+        this.setState({ currentMonthData: [ 
+            [
+                {value: 'Day', readOnly: true},
+                {value: 'Date', readOnly: true},
+                {value: 'Entrance time', readOnly: true},
+                {value: 'Exit time', readOnly: true},
+                {value: 'Total', readOnly: true},
+                {value: 'Holiday', readOnly: true},
+                {value: 'Comment', readOnly: true},
+              ],
+              [{value: 1}, {value: 3}, {value: 3}, {value: 3}, {value: 3}, {value: 3}, {value: 3}],
+              [{value: 2}, {value: 4}, {value: 4}, {value: 4}, {value: 4}, {value: 4}, {value: 4}],
+              [{value: 1}, {value: 3}, {value: 3}, {value: 3}, {value: 3}, {value: 3}, {value: 3}],
+              [{value: 2}, {value: 4}, {value: 4}, {value: 4}, {value: 4}, {value: 4}, {value: 4}]            
+        ]});
+    }
+    setupData = (cb: Function) => {
         this._isMounted = true;
-        this.setHoursPerDay();
-        this.setExtraHoursPerDay();
-        this.setMonths();
-        this.setComponentLoaded();
+        Promise.all([this.setHoursPerDay(),this.setExtraHoursPerDay(),this.setMonths(),this.setCalculatorColumns(),this.getAndSetUserPreferences()])
+            .then((values) => {
+                this.setSelectedMonthData();
+                cb();
+        });
+    }
+    componentDidMount() {
+        this.setupData(this.setComponentLoaded);        
     }
     getUserDisplayName = (): string => this.context.user?.displayName ?? this.context.user?.email ?? "";
 
@@ -156,11 +220,11 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
                 <div className={classes.StatsHourWrapper}>
                     <div style={selectStyle}>
                         <Select isMulti={false} options={hoursPerDayOptions} onChange={this.hoursPerDayChangedHandler} 
-                            defaultValue={hoursPerDayOptions[0]} placeholder="Hours per day" />
+                            defaultValue={hoursPerDayOptions[this.state.hoursPerDayChoosedIndex]} placeholder="Hours per day" />
                     </div>
                     <div style={selectStyle}>
                         <Select isMulti={false} options={extraHoursOptions} onChange={this.extraHoursChangedHandler} 
-                            defaultValue={extraHoursOptions[0]} placeholder="Extra hours per day" />
+                            defaultValue={extraHoursOptions[this.state.extraHoursChoosedIndex]} placeholder="Extra hours per day" />
                     </div>
                 </div>
             </div>
@@ -171,6 +235,17 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
                 <React.Fragment>
                     {this.props.openSideBar ? sideBar : null}
                     <main className={classes.MainWrapper}>
+                        <ReactDataSheet 
+                            data={this.state.currentMonthData} 
+                            valueRenderer={ (cell: any) => cell.value }
+                            onCellsChanged={changes => {
+                                const grid = this.state.currentMonthData.map(row => [...row]);
+                                changes.forEach(({ cell, row, col, value }) => {
+                                  grid[row][col] = { ...grid[row][col], value };
+                                });
+                                this.setState({currentMonthData: grid});
+                              }}
+                        />
                     </main>
                 </React.Fragment>
         );

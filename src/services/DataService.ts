@@ -39,7 +39,16 @@ export const getSavedMonths = async(username: string): Promise<Array<Month>> => 
         }
         return monthArrays;
     } catch (err) {
-        console.log(`GetSavedMonths error: ${err}`);
+        console.log(`getSavedMonths error: ${err}`);
         return [];
+    }
+}
+export const getUserPreferences = async(username: string): Promise<any> => {
+    try {
+        const res: AxiosResponse = await axiosInstance.get(`/userData/${convertToSavedFormat(username)}/preferences.json`);
+        return res.data;
+    } catch (err) {
+        console.log(`getUserPreferences error: ${err}`);
+        return undefined;
     }
 }

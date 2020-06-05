@@ -10,11 +10,25 @@
 .AsideWrapper {
     grid-column: 1 / 2;
     grid-row: 2 / 4;
-    background: green;
+    background: linear-gradient(to top, #16222A, #3A6073);
 }
 
 .MainWrapper {
     grid-column: 2 / 3;
     grid-row: 2 / 4;
-    background: pink;
+    background: #969696;
+}
+
+@media only screen and (max-device-width: 600px),
+only screen and (max-width: 600px) {
+    .MainWrapper {
+        /* grid-column: 1 / 1;
+        grid-row: 2 / 3;
+        background: #969696; */
+    }
+    .AppContainer {
+        grid-template-rows: 45px 630px 45px;
+        /* grid-template-columns: 0px auto; */
+        /* Statistics and month options will be displayed differently from mobile view */
+    }
 }

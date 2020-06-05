@@ -5,7 +5,7 @@
 }
 
 .AppContainer {
-    background: pink;
+    background: #969696;
     display: grid;
     grid-template-rows: 50px 721px 50px;
     grid-template-columns: 260px auto;
@@ -17,11 +17,10 @@ input {
     appearance: none;
 }
 
-@media only screen and (max-device-width: 600px),
+
+/* @media only screen and (max-device-width: 600px),
 only screen and (max-width: 600px) {
     .AppContainer {
-        grid-template-rows: 45px 630px 45px;
-        /* grid-template-columns: 0px auto; */
-        /* Statistics and month options will be displayed differently from mobile view */
+        grid-template-columns: auto;
     }
-}
+} */

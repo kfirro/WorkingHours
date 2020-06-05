@@ -17,15 +17,19 @@ type AppState = {
 class App extends React.Component<AppProps,AppState> {
 
   state = {
-    sideBar: false
+    sideBar: true
   }
   toggleSideBar = () => {
     this.setState(prevState => ({
       sideBar: !prevState.sideBar
     }));
   }
-
+  componentDidMount(){
+    if(window.outerWidth < 600)
+      this.setState({sideBar: false});
+  }
   render() {
+    
     return (
     <UserProvider>
       <BrowserRouter>
