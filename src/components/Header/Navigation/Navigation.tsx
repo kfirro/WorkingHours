@@ -17,24 +17,20 @@ type NavigationProps = {
 
 const Navigation: React.FC<NavigationProps> = ({ logoutClicked, hideThumbnail, showMenu, thumbnailClicked }) => {
     const user = useContext(UserContext).user;
+    let greetingElement = user ? <li style={{ textTransform: 'capitalize' }}>{user.displayName ?? user.email ?? "N/A"}</li> : undefined;
     let logoutClasses = user ? classes.NavLink : [classes.NavLink, classes.Disabled].join(' ');
     let hideThumbnailClass = hideThumbnail ? classes.HideLogoThumbMobile : undefined;
-    // let menu = showMenu ? <>
-    //     <li>
-    //         <NavLink to="/workinghours" className={classes.NavLink} activeClassName={classes.ActiveLink}>Calculator</NavLink>
-    //     </li>                
-    //     <li>
-    //         <LogoutLink navTo="/" cssClass={logoutClasses} activeCssClass={classes.ActiveLink} clicked={logoutClicked}>Logout</LogoutLink>
-    //     </li>
-    // </> : undefined;
     let menu = showMenu ?
-        <li style={{marginLeft: 'auto'}}>
-            <LogoutLink navTo="/" cssClass={logoutClasses} activeCssClass={classes.ActiveLink} clicked={logoutClicked}><FontAwesomeIcon size={"2x"} icon={faSignOutAlt}/></LogoutLink>
-        </li>
+        <React.Fragment>
+            {greetingElement}
+            <li style={{marginLeft: 'auto'}}>
+                <LogoutLink navTo="/" cssClass={logoutClasses} activeCssClass={classes.ActiveLink} clicked={logoutClicked}><FontAwesomeIcon size={"2x"} icon={faSignOutAlt}/></LogoutLink>
+            </li>
+        </React.Fragment>
         : undefined;
     return (
         <nav className={classes.NavigationNavElement}>
-            <ul style={{ listStyleType: 'none', display: 'flex', margin: '0', padding: '0' }}>
+            <ul style={{ listStyleType: 'none', display: 'flex', margin: '0', padding: '0', alignItems: 'center'}}>
                 <li style={{ order: 0 }}>
                     <img className={hideThumbnailClass} style={{ width: '30px', height: '30px', padding: '0px 10px' }} src={logo} alt="logo" onClick={(e) => thumbnailClicked(e)}/>
                 </li>

@@ -17,6 +17,7 @@ const convertToSavedFormat = (data: string): string => {
     });
     return savedFormatString;
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const convertToReadableFormat = (data: string): string => {
     let readableFormatString = decodeURIComponent(data ?? "");
     Object.values(replacementCharacters).forEach(el => {

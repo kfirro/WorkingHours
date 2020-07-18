@@ -45,6 +45,10 @@ input {
     transition: background-color .3s;
 }
 
+input[type=submit] {
+    cursor: pointer;
+}
+
 .User:before {
     content: '\f007';
     font: 14px fontawesome;

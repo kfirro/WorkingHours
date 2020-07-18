@@ -7,8 +7,8 @@
 .AppContainer {
     background: #969696;
     display: grid;
-    grid-template-rows: 50px 721px 50px;
-    grid-template-columns: 260px auto;
+    grid-template-rows: 40px 790px 30px;
+    grid-template-columns: 300px auto;
 }
 
 input {

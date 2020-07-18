@@ -185,7 +185,6 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
 
     }
     render() {
-        const displayName = this.getUserDisplayName();
         const isLoggedIn = this.context.user ? true : false;
         const hoursPerDayOptions = Object.values(this.state.hoursPerDay).map((h, index) => { 
             return { key: index + '_' + h, value: h, label: h }; 
@@ -198,8 +197,7 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
             margin: '10px 5px'
         };
         const sideBar = <aside className={classes.AsideWrapper} >
-        <Loader className={loaderClasses.Loader} loaded={this.state.componentLoaded}>
-            <div style={{ textTransform: 'capitalize' }}>Hello, {displayName}</div>
+        <Loader className={loaderClasses.Loader} loaded={this.state.componentLoaded}>            
             <div className={classes.PanelWrapper}>
                 <MonthPicker minValue={this.createMinMonthValue()} maxValue={this.createMaxMonthValue()}
                     months={this.state.months} monthChangedHandler={this.monthChangedHanlder}
@@ -234,7 +232,7 @@ export default class Calculator extends Component<CalculatorProps, CalculatorSta
             !isLoggedIn ? <Redirect to="/login" /> :
                 <React.Fragment>
                     {this.props.openSideBar ? sideBar : null}
-                    <main className={classes.MainWrapper}>
+                    <main className={this.props.openSideBar ? classes.MainWrapper : classes.MainWrapperWithoutSideBar}>
                         <ReactDataSheet 
                             data={this.state.currentMonthData} 
                             valueRenderer={ (cell: any) => cell.value }
